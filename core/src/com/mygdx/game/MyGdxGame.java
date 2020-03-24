@@ -73,10 +73,10 @@ public class MyGdxGame implements Screen {
 
     private void spawnRaindrop() {
         Rectangle raindrop = new Rectangle();
-        raindrop.x = MathUtils.random(0, 800 - 64);
-        raindrop.y = 480;
-        raindrop.width = 64;
-        raindrop.height = 64;
+        raindrop.x = MathUtils.random(0, VIEWPORT_WIDTH - 64);
+        raindrop.y = VIEWPORT_HEIGHT;
+        raindrop.width = hero.getWidth();
+        raindrop.height = hero.getHeight();
         raindrops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
@@ -139,12 +139,24 @@ public class MyGdxGame implements Screen {
             }
 
 
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+                bucket.x -= 200 * Gdx.graphics.getDeltaTime();
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+                bucket.x += 200 * Gdx.graphics.getDeltaTime();
 
             // убедитесь что ведро остается в пределах экрана
-            if (bucket.x < 0) bucket.x = 0;
-            if (bucket.x > 800 - 64) bucket.x = 800 - 64;
+            System.out.println("bucket.x < 0 "  + bucket.x );
+            if (bucket.x < 0) {
+                bucket.x = 0;
+                System.out.println("bucket.x < 0 "  + bucket.x );
+            }
+            if (bucket.x > VIEWPORT_WIDTH - hero.getWidth()) {
+                bucket.x = VIEWPORT_WIDTH - hero.getWidth();
+                System.out.println("bucket.x > VIEWPORT_WIDTH + hero.getWidth()"  + bucket.x );
+
+
+
+            }
 
             // проверка, нужно ли создавать новую каплю
             if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
@@ -157,27 +169,27 @@ public class MyGdxGame implements Screen {
                 Rectangle raindrop = iter.next();
                 System.out.println(spead);
                 raindrop.y -= spead * Gdx.graphics.getDeltaTime();
-                if (raindrop.y + 64 < 0) {
-                    spead ++;
-                    soruse ++;
+                if (raindrop.y + hero.getHeight() < 0) {
+                    spead++;
+                    soruse++;
 
                     iter.remove();
                 }
                 if (raindrop.overlaps(bucket)) {
-                    soruse --;
-                    lifes --;
+                    soruse--;
+                    lifes--;
 
 
                     iter.remove();
                 }
             }
-        }else {
+        } else {
 
             if (Gdx.input.justTouched()) {
 
-                    soruse = 0;
-                    spead = 200;
-                    lifes = INT;
+                soruse = 0;
+                spead = 200;
+                lifes = INT;
 
 
             }
@@ -197,7 +209,6 @@ public class MyGdxGame implements Screen {
     public void show() {
 
     }
-
 
 
     @Override
@@ -221,14 +232,16 @@ public class MyGdxGame implements Screen {
     private void showSpedAndPointsLifes() {
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(2.0F);
-        font.draw(batch, String.format("\t Lifes:%s \n Points: %s " + "\n" + "Speed: %s", lifes,soruse, spead), VIEWPORT_WIDTH / 4, VIEWPORT_HEIGHT / 2);
+        font.draw(batch, String.format("\t Lifes:%s \n Points: %s " + "\n" + "\tSpeed: %s", lifes, soruse, spead), VIEWPORT_WIDTH / 6, VIEWPORT_HEIGHT / 2);
     }
 
 
     private void showGameOver() {
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(2.0F);
-        font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + " \tSpeed: %s \n Touch the screen for the new game ", soruse, spead), VIEWPORT_WIDTH / 5, VIEWPORT_HEIGHT / 2);
+        font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + " \tSpeed: %s ", soruse, spead), VIEWPORT_WIDTH / 6, VIEWPORT_HEIGHT / 1.5f);
+        font.draw(batch, " \t Touch the screen for ", VIEWPORT_WIDTH / 8, VIEWPORT_HEIGHT / 2.5f);
+        font.draw(batch, " \t the new game", VIEWPORT_WIDTH / 8, VIEWPORT_HEIGHT / 3f);
     }
 
 
