@@ -228,17 +228,8 @@ public class MyGdxGame implements Screen {
     private void showGameOver() {
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(2.0F);
-        font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + "Speed: %s \n Touch the screen for the new game ", soruse, spead), VIEWPORT_WIDTH / 4, VIEWPORT_HEIGHT / 2);
+        font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + " \tSpeed: %s \n Touch the screen for the new game ", soruse, spead), VIEWPORT_WIDTH / 5, VIEWPORT_HEIGHT / 2);
     }
 
-    private static boolean handleimage(Rectangle raindrop, float touchX, float touchY) {
 
-        // Проверяем, находятся ли координаты касания экрана
-        if ((touchX >= raindrop.x) && touchX <= (raindrop.x + raindrop.width) && (touchY >= raindrop.y) && touchY <= (raindrop.y + raindrop.height)) {
-
-
-            return true;
-        }
-        return false;
-    }
 }
