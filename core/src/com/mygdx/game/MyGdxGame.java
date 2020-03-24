@@ -18,6 +18,7 @@ import java.util.Iterator;
 public class MyGdxGame implements Screen {
     public static final int VIEWPORT_WIDTH = 400;
     public static final int VIEWPORT_HEIGHT = 495;
+    public static final int INT = 5;
     Texture hero, bombe, heroRip;
 
     SpriteBatch batch;
@@ -30,7 +31,7 @@ public class MyGdxGame implements Screen {
     private int spead = 200;
     private long soruse;
     private BitmapFont font;
-    private int lifes = 5;
+    private int lifes = INT;
 
 
     public MyGdxGame(Drop drop) {
@@ -167,6 +168,12 @@ public class MyGdxGame implements Screen {
                     iter.remove();
                 }
             }
+        }else {
+            if (Gdx.input.isTouched()) {
+                soruse = 0;
+                spead = 200;
+                lifes = INT;
+            }
         }
     }
 
@@ -207,14 +214,14 @@ public class MyGdxGame implements Screen {
     private void showSpedAndPointsLifes() {
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(2.0F);
-        font.draw(batch, String.format("Lifes:%s \n Points: %s " + "\n" + "Speed: %s", lifes,soruse, spead), VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
+        font.draw(batch, String.format("\t Lifes:%s \n Points: %s " + "\n" + "Speed: %s", lifes,soruse, spead), VIEWPORT_WIDTH / 4, VIEWPORT_HEIGHT / 2);
     }
 
 
     private void showGameOver() {
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(2.0F);
-        font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + "Speed: %s", soruse, spead), VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
+        font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + "Speed: %s \n Touch the screen for the new game ", soruse, spead), VIEWPORT_WIDTH / 4, VIEWPORT_HEIGHT / 2);
     }
 
 }
