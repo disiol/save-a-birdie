@@ -3,6 +3,8 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -19,6 +21,8 @@ public class MyGdxGame implements Screen {
     public static final int VIEWPORT_WIDTH = 400;
     public static final int VIEWPORT_HEIGHT = 495;
     public static final int INT = 5;
+    private final Sound dropSound;
+    private final Music deadMusic;
     Texture hero, bombe, heroRip;
 
     SpriteBatch batch;
@@ -42,6 +46,9 @@ public class MyGdxGame implements Screen {
         bombe = new Texture(Gdx.files.internal("Bombe.png"));
         hero = new Texture(Gdx.files.internal("BirdEnemyFlapSprite.png"));
         heroRip = new Texture(Gdx.files.internal("BirdEnemyDeathSprite.png"));
+
+        dropSound = Gdx.audio.newSound(Gdx.files.internal("kuritsa.mp3"));
+      deadMusic = Gdx.audio.newMusic(Gdx.files.internal("vorona.mp3"));
 
         font = new BitmapFont();
 
@@ -178,13 +185,14 @@ public class MyGdxGame implements Screen {
                 if (raindrop.overlaps(bucket)) {
                     soruse--;
                     lifes--;
+                    dropSound.play();
 
 
                     iter.remove();
                 }
             }
         } else {
-
+            deadMusic.play();
             if (Gdx.input.justTouched()) {
 
                 soruse = 0;
