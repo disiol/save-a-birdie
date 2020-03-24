@@ -3,7 +3,6 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -15,10 +14,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.Iterator;
-
-import javax.swing.plaf.synth.SynthContext;
-
-import static com.badlogic.gdx.Gdx.app;
 
 public class MyGdxGame implements Screen {
     public static final int VIEWPORT_WIDTH = 400;
@@ -35,6 +30,7 @@ public class MyGdxGame implements Screen {
     private int spead = 200;
     private long soruse;
     private BitmapFont font;
+    private int lifes = 5;
 
 
     public MyGdxGame(Drop drop) {
@@ -92,7 +88,15 @@ public class MyGdxGame implements Screen {
         batch.begin();
         batch.draw(background, 0, 0);
 
-        showSpedAndPoints();
+        if (lifes > 0) {
+            showSpedAndPointsLifes();
+        } else {
+            showGameOver();
+            batch.draw(heroRip, bucket.x, bucket.y);
+
+            batch.end();
+        }
+
 
         // сообщает камере, что нужно обновить матрицы
         camera.update();
@@ -101,60 +105,67 @@ public class MyGdxGame implements Screen {
         // визуализации указанной для камеры.
         batch.setProjectionMatrix(camera.combined);
 
-        // начинаем новую серию, рисуем ведро и
-        // все капли
-        //batch.begin();
-        batch.draw(hero, bucket.x, bucket.y);
-        for (Rectangle raindrop : raindrops) {
-            batch.draw(bombe, raindrop.x, raindrop.y);
-        }
-        batch.end();
+        if (lifes > 0) {
+            // начинаем новую серию, рисуем ведро и
+            // все капли
+            //batch.begin();
+            batch.draw(hero, bucket.x, bucket.y);
+            for (Rectangle raindrop : raindrops) {
+                batch.draw(bombe, raindrop.x, raindrop.y);
+            }
+            batch.end();
 
 
-        Vector3 touchPos = new Vector3();
-        Vector3 touchPosEnd = new Vector3();
-        if (Gdx.input.isTouched()) {
-            if (isFirstTouch) {
-                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                isFirstTouch = false;
+            Vector3 touchPos = new Vector3();
+            Vector3 touchPosEnd = new Vector3();
+            if (Gdx.input.isTouched()) {
+                if (isFirstTouch) {
+                    touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                    isFirstTouch = false;
+                } else {
+                    touchPosEnd.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                    camera.unproject(touchPos);
+                    camera.unproject(touchPosEnd);
+                    bucket.x = touchPosEnd.x - touchPos.x;
+
+                    touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                }
             } else {
-                touchPosEnd.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                camera.unproject(touchPos);
-                camera.unproject(touchPosEnd);
-                bucket.x = touchPosEnd.x - touchPos.x;
-
-                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                isFirstTouch = true;
             }
-        } else {
-            isFirstTouch = true;
-        }
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
 
-        // убедитесь что ведро остается в пределах экрана
-        if (bucket.x < 0) bucket.x = 0;
-        if (bucket.x > 800 - 64) bucket.x = 800 - 64;
+            // убедитесь что ведро остается в пределах экрана
+            if (bucket.x < 0) bucket.x = 0;
+            if (bucket.x > 800 - 64) bucket.x = 800 - 64;
 
-        // проверка, нужно ли создавать новую каплю
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+            // проверка, нужно ли создавать новую каплю
+            if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
 
-        // движение капли, удаляем все капли выходящие за границы экрана
-        // или те, что попали в ведро. Воспроизведение звукового эффекта
-        // при попадании.
-        Iterator<Rectangle> iter = raindrops.iterator();
-        while (iter.hasNext()) {
-            Rectangle raindrop = iter.next();
-            System.out.println(spead);
-            raindrop.y -= spead * Gdx.graphics.getDeltaTime();
-            if (raindrop.y + 64 < 0) {
-                iter.remove();
-            }
-            if (raindrop.overlaps(bucket)) {
-                spead ++;
-                soruse ++;
-                iter.remove();
+            // движение капли, удаляем все капли выходящие за границы экрана
+            // или те, что попали в ведро. Воспроизведение звукового эффекта
+            // при попадании.
+            Iterator<Rectangle> iter = raindrops.iterator();
+            while (iter.hasNext()) {
+                Rectangle raindrop = iter.next();
+                System.out.println(spead);
+                raindrop.y -= spead * Gdx.graphics.getDeltaTime();
+                if (raindrop.y + 64 < 0) {
+                    spead ++;
+                    soruse ++;
+
+                    iter.remove();
+                }
+                if (raindrop.overlaps(bucket)) {
+                    soruse --;
+                    lifes --;
+
+
+                    iter.remove();
+                }
             }
         }
     }
@@ -193,10 +204,17 @@ public class MyGdxGame implements Screen {
 
     }
 
-    private void showSpedAndPoints() {
+    private void showSpedAndPointsLifes() {
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.getData().setScale(2.0F);
-        font.draw(batch, String.format("Points: %s " + "\n" + "Speed: %s", soruse, spead), VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
+        font.draw(batch, String.format("Lifes:%s \n Points: %s " + "\n" + "Speed: %s", lifes,soruse, spead), VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
+    }
+
+
+    private void showGameOver() {
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        font.getData().setScale(2.0F);
+        font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + "Speed: %s", soruse, spead), VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
     }
 
 }
