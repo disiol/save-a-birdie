@@ -33,6 +33,9 @@ public class MyGdxGame implements Screen {
     private BitmapFont font;
     private int lifes = INT;
 
+    private float touchX;
+    private float touchY;
+
 
     public MyGdxGame(Drop drop) {
         // загрузка изображений для капли и ведра, 64x64 пикселей каждый
@@ -169,10 +172,14 @@ public class MyGdxGame implements Screen {
                 }
             }
         }else {
-            if (Gdx.input.isTouched()) {
-                soruse = 0;
-                spead = 200;
-                lifes = INT;
+
+            if (Gdx.input.justTouched()) {
+
+                    soruse = 0;
+                    spead = 200;
+                    lifes = INT;
+
+
             }
         }
     }
@@ -224,4 +231,14 @@ public class MyGdxGame implements Screen {
         font.draw(batch, String.format("The birdie died: \n Points: %s " + "\n" + "Speed: %s \n Touch the screen for the new game ", soruse, spead), VIEWPORT_WIDTH / 4, VIEWPORT_HEIGHT / 2);
     }
 
+    private static boolean handleimage(Rectangle raindrop, float touchX, float touchY) {
+
+        // Проверяем, находятся ли координаты касания экрана
+        if ((touchX >= raindrop.x) && touchX <= (raindrop.x + raindrop.width) && (touchY >= raindrop.y) && touchY <= (raindrop.y + raindrop.height)) {
+
+
+            return true;
+        }
+        return false;
+    }
 }
